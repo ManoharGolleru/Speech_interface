@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Synthesizer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: start; /* Aligns items at the top */
+            gap: 20px; /* Adds space between the containers */
+            margin-top: 20px; /* Adjust as needed for vertical positioning */
+            margin-bottom: 15px;
+        }
+
+        .side-container {
+            background-color: #ffffff; /* White background */
+            padding: 20px;
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            margin: 0px 0; /* Vertical margin for spacing */
+            width: 300px; /* Adjust width as needed */
+        }
+
+        .side-container input[type="text"] {
+            width: calc(100% - 12px); /* Full width minus padding for alignment */
+            padding: 6px; /* Comfortable padding */
+            border: 1px solid #cccccc; /* Light gray border */
+            border-radius: 5px; /* Rounded corners for the input field */
+            margin-bottom: 150px; /* Spacing below the input field */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            font-size: 1rem; /* Appropriate font size */
+        }
+
+
+        .side-container h2 {
+            color: #333333; /* Dark gray color */
+            margin-bottom: 20px; /* Spacing below the heading */
+        }
+
+        .side-container label {
+            display: block; /* Ensures the label is on its own line */
+            margin-bottom: 5px; /* Spacing between label and input/textarea */
+            color: #555555; /* Medium gray color */
+            font-weight: bold; /* Makes the label text bold */
+        }
+
+        
+
+        .save-logs-button {
+            width: 100%; /* Full width button */
+            padding: 10px 0; /* Padding for top and bottom */
+            background-color: #007bff; /* Bootstrap primary blue */
+            color: #ffffff; /* White text */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners for the button */
+            cursor: pointer; /* Cursor changes to pointer on hover */
+            transition: background-color 0.3s; /* Smooth background color change on hover */
+        }
+
+        .save-logs-button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+
+
+        .container {
+            text-align: center;
+            width: 700px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            border-radius: 10px;
+            flex-shrink: 0;
+            
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            max-width: -webkit-fill-available;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            resize: vertical;
+            border-bottom: groove;
+        }
+
+        .flex-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .flex-column {
+            width: 48%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #444;
+        }
+
+        input[type="number"], input[type="range"] {
+            width: 100%;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        input[type="number"] {
+        -moz-appearance: textfield;
+        -webkit-appearance: none; /* Hide spinners in WebKit browsers */
+        appearance: none; /* Standard property for future compatibility */
+        border: 1px solid #ccc; /* Consistent border styling */
+        border-radius: 4px; /* Rounded corners */
+        padding: 6px 10px; /* Comfortable padding */
+        font-size: 1rem; /* Matching font size with other inputs */
+        }
+
+        /* WebKit-specific: Remove spinners */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0; /* Removes default margin in WebKit browsers */
+        }
+
+
+        .synthesize-button, .text-area-container button {
+            cursor: pointer;
+            width: auto;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .synthesize-button:hover, .text-area-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .value-label {
+            margin-left: 5px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        audio {
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, auto);  /* Adjust columns to content size */
+            gap: 200px;  /* Space between buttons */
+            justify-content: center; /* Center the buttons in the grid container */
+            padding: 10px 0;
+        }
+
+
+        .action-buttons button {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #acceptButton {
+            background-color: #4CAF50; /* Green */
+        }
+
+        #acceptButton:hover {
+            background-color: #45a049;
+        }
+
+        #rejectButton {
+            background-color: #f44336; /* Red */
+        }
+
+        #rejectButton:hover {
+            background-color: #d32f2f;
+        }
+
+    </style>
+</head>
+<body>
+
+
+    <div class="main-container">
+
+        <div class="side-container">
+            <h2>User Details</h2>
+        
+            <div>
+                <label for="Name">Name:</label>
+                <input type="text" id="Name" placeholder="Enter your name here">
+            </div>
+        
+            <div>
+                <label for="SaveLogs">Save Logs</label>
+                <button class="save-logs-button" onclick="saveLogs()">Save Logs</button>
+            </div>
+        </div>
+        
+    
+        <div class="container">
+            <h1>Speech Synthesizer</h1>
+            
+            <div class="text-area-container">
+                <textarea id="text" placeholder="Enter your text here"></textarea>
+                <button onclick="requestTranscript()">Generate Transcript</button>
+            </div>
+            
+            <h4>Transcript:</h4>
+            <textarea id="transcript" placeholder="Transcript will appear here for editing"></textarea>
+            
+            <div class="flex-row">
+                <div class="flex-column">
+                    <label for="Speaker1">Speaker 1:</label>
+                    <input type="number" id="Speaker1" placeholder="Speaker 1" value="0.9" step="0.1">
+                </div>
+                <div class="flex-column">
+                    <label for="Speaker2">Speaker 2:</label>
+                    <input type="number" id="Speaker2" placeholder="Speaker 2" value="0.1" step="0.1">
+                </div>
+            </div>
+            
+            <div class="flex-row">
+                <div class="flex-column">
+                    <label for="pitch">Pitch: <span id="pitchValue" class="value-label">0.5</span></label>
+                    <input type="range" id="pitch" min="0" max="2" step="0.1" value="0.5" oninput="updateValue('pitch', 'pitchValue')">
+                </div>
+                <div class="flex-column">
+                    <label for="rate">Rate: <span id="rateValue" class="value-label">0.5</span></label>
+                    <input type="range" id="rate" min="0.5" max="2" step="0.1" value="0.5" oninput="updateValue('rate', 'rateValue')">
+                </div>
+            </div>
+            
+            <button class="synthesize-button" onclick="synthesizeSpeech()">Synthesize</button>
+            <audio id="audioPlayer" controls></audio>
+
+            <div class="action-buttons">
+                <button id="acceptButton" onclick="logDecision('Accept')">Accept</button>
+                <button id="rejectButton" onclick="logDecision('Reject')">Reject</button>
+            </div>
+            
+
+
+        </div>
+    </div>
+
+
+
+    <script>
+
+        
+        let interactions = [];
+
+        function logDecision(decision) {
+        const currentData = gatherCurrentData();  // Function to gather all relevant data from the page
+        currentData.decision = decision;
+        interactions.push(currentData);  // Push the current state with the decision
+        }
+
+        function gatherCurrentData() {
+            return {
+                name: document.getElementById('Name').value || 'Name',
+                text: document.getElementById('text').value,
+                transcript: document.getElementById('transcript').value,
+                speaker1: document.getElementById('Speaker1').value,
+                speaker2: document.getElementById('Speaker2').value,
+                pitch: document.getElementById('pitch').value,
+                rate: document.getElementById('rate').value,
+                date: new Date().toLocaleDateString('en-US'),
+                time: new Date().toLocaleTimeString('en-US'),
+                decision: ''
+            };
+        }
+
+
+
+        function updateValue(inputId, valueId) {
+                var value = document.getElementById(inputId).value;
+                document.getElementById(valueId).innerText = value;
+            }
+
+        
+        async function requestTranscript() {
+            const text = document.getElementById('text').value;
+
+            try {
+                const response = await fetch('http://104.197.90.64:5000/generate_transcript', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('transcript').value = data.transcript;
+                } else {
+                    console.error('Error generating transcript:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Failed to request transcript:', error);
+            }
+        }
+
+        async function synthesizeSpeech() {
+            const transcript = document.getElementById('transcript').value;
+            const Speaker1 = parseFloat(document.getElementById('Speaker1').value);
+            const Speaker2 = parseFloat(document.getElementById('Speaker2').value);
+            const pitch = parseFloat(document.getElementById('pitch').value);
+            const rate = parseFloat(document.getElementById('rate').value);
+
+            try {
+                const response = await fetch('http://104.197.90.64:5000/synthesize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        transcript,
+                        Speaker1,
+                        Speaker2,
+                        pitch,
+                        rate,
+                    }),
+                });
+
+                if (response.ok) {
+                    const audioBlob = await response.blob();
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audioPlayer = document.getElementById('audioPlayer');
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.play();
+                } else {
+                    console.error('Error synthesizing speech:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Failed to synthesize speech:', error);
+            }
+        }
+
+
+        function saveLogs() {
+        const Name = document.getElementById('Name').value || 'Name';;
+        const text = document.getElementById('text').value;
+        const transcript = document.getElementById('transcript').value;
+        const speaker1 = document.getElementById('Speaker1').value;
+        const speaker2 = document.getElementById('Speaker2').value;
+        const pitch = document.getElementById('pitch').value;
+        const rate = document.getElementById('rate').value;
+        const currentDate = new Date();
+
+        // Format date and time
+        const formattedDate = currentDate.toLocaleDateString('en-US');
+        const formattedTime = currentDate.toLocaleTimeString('en-US');
+
+        // CSV headers
+        let csvContent = "Name,Date,Time,Text,Transcript,Speaker 1,Speaker 2,Pitch,Rate,User Decision\n";
+
+        // Generate CSV rows from interactions
+        interactions.forEach((data) => {
+            csvContent += `${data.name},${data.date},${data.time},${data.text},${data.transcript},${data.speaker1},${data.speaker2},${data.pitch},${data.rate},${data.decision}\n`;
+        });
+
+        // Last logged decision to name the file
+        const lastInteraction = interactions[interactions.length - 1] || 'NoDecision';
+        const filename = `${Name}_${formattedDate}_${formattedTime}_logs.csv`; 
+
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename; // Use the new filename
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+
+        
+    }
+
+    </script>
+</body>
+</html>
